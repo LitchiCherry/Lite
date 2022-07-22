@@ -1,1 +1,52 @@
+mixed-port: 10808
+allow-lan: true
+mode: Rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+dns:
+    enable: true
+    ipv6: false
+    default-nameserver: [223.5.5.5, 114.114.114.114]
+    #enhanced-mode: redir-host
+    enhanced-mode: fake-ip
+    fake-ip-range: 198.18.0.1/16
+    #use-hosts: true
+    #'*.clash.dev': 127.0.0.1
+    nameserver: [223.5.5.5, 'https://dns.alidns.com/dns-query']
+    fallback: ['tls://1.0.0.1:853', 'https://cloudflare-dns.com/dns-query', 'https://dns.google/dns-query']
+    fallback-filter: { geoip: true, ipcidr: [240.0.0.0/4, 0.0.0.0/32] }
+proxy-providers:
+  Airport:
+    type: http
+    url: "xxxxx"
+    interval: 86400
+    path: ./Airport.yaml
+    health-check:
+      enable: true
+      interval: 600
+      url: http://www.qualcomm.cn/generate_204
 
+proxies:
+proxy-groups:
+  - name: 🔰 节点代理
+    type: select
+    use:
+      - Airport
+   - name: 🕸 FINAL
+    type: select
+    proxies:
+      - 🔰 节点代理
+      - DIRECT
+ 
+rules:
+ - DOMAIN-SUFFIX,google.com,🔰 节点代理
+ - DOMAIN-KEYWORD,google,🔰 节点代理
+ - DOMAIN-SUFFIX,youtube.com,🔰 节点代理
+ - DOMAIN-SUFFIX,googlevideo.com,🔰 节点代理
+ - DOMAIN-SUFFIX,youtube.com,🔰 节点代理
+ - DOMAIN-SUFFIX,ytimg.com,🔰 节点代理
+ - DOMAIN-SUFFIX,googleapis.com,🔰 节点代理
+ - DOMAIN-SUFFIX,ggpht.com,🔰 节点代理
+ - GEOIP,LAN,DIRECT
+ - GEOIP,CN,DIRECT
+ - MATCH,🕸 FINAL
